@@ -1,0 +1,44 @@
+{
+  "name": "odp-notification-engine",
+  "version": "3.9.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "lint": "./node_modules/.bin/eslint app.js api/ config/ --fix",
+    "test": "nyc --reporter=html --reporter=json-summary mocha"
+  },
+  "keywords": [],
+  "author": "codeGenerator",
+  "license": "ISC",
+  "dependencies": {
+    "@appveen/odp-utils": "1.5.8",
+    "@appveen/swagger-mongoose-crud": "1.1.2",
+    "@appveen/utils": "1.1.2",
+    "amqplib": "^0.5.2",
+    "bluebird": "^3.5.0",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "fs": "0.0.1-security",
+    "inquirer": "^4.0.2",
+    "js-yaml": "^3.13.1",
+    "log4js": "^2.5.3",
+    "mongoose": "5.4.17",
+    "morgan": "^1.9.0",
+    "ncp": "^2.0.0",
+    "node-cron": "^2.0.3",
+    "nodemailer": "^4.6.3",
+    "request": "^2.85.0",
+    "stomp-client": "^0.9.0",
+    "swagger": "^0.7.5",
+    "swagger-tools": "^0.10.4",
+    "url": "^0.11.0",
+    "util": "^0.10.3"
+  },
+  "devDependencies": {
+    "eslint": "^5.1.0",
+    "husky": "^1.2.0",
+    "mocha": "^6.2.1",
+    "nyc": "^14.1.1"
+  }
+}
