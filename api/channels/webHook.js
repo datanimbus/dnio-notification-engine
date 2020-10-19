@@ -215,6 +215,10 @@ e.retryInvokeHook = function (_doc,client) {
         passed: [], failed: []
     };
     let postData = _doc;
+    if(_doc && _doc.data && _doc.data.data && _doc.data.data.old)
+        _doc.data.data.old = JSON.parse(_doc.data.data.old);
+    if(_doc && _doc.data && _doc.data.data && _doc.data.data.new)
+        _doc.data.data.new = JSON.parse(_doc.data.data.new);
     postData.data = _doc.data;
     postData.id = _doc._id;
     postData.name = _doc.name;
