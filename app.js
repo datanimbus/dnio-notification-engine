@@ -10,7 +10,7 @@ let debugDB = false;
 if (process.env.LOG_LEVEL == "DB_DEBUG") { process.env.LOG_LEVEL = "debug"; debugDB = true; }
 const utils = require("@appveen/utils");
 const envConfig = require("./config/config.js");
-const loggerName = envConfig.isK8sEnv() ? `[${process.env.HOSTNAME}] [${process.env.ODP_NAMESPACE}]` : "[notificationEngine]";
+const loggerName = envConfig.isK8sEnv() ? `[${process.env.HOSTNAME}] [${process.env.DATA_STACK_NAMESPACE}]` : "[notificationEngine]";
 const log4js = utils.logger.getLogger;
 const logger = log4js.getLogger(loggerName);
 let timeOut = process.env.API_REQUEST_TIMEOUT || 120;
