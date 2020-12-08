@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
         - name: ne
-          image: '__docker_registry_server__/odp:ne.__release__'
+          image: '__docker_registry_server__/data.stack:ne.__release__'
           ports:
             - containerPort: 10010
           livenessProbe:
