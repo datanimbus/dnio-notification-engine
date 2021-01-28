@@ -16,15 +16,15 @@ var queueSMSP2 = envConfig.queueNames.sms.p2;
 var retryCollection = envConfig.retryCollectionName;
 //var client = NATS.connect('test-cluster', 'notification', envConfig.NATSConfig);
 //var client = require('node-nats-streaming').connect(config.cluster_id,config.client_id,config);
-var clients = require("@appveen/odp-utils").natsStreaming;
-var clientId = isK8sEnv() ? `${process.env.HOSTNAME}` : "NE";
-var client = clients.init("odp-cluster", clientId, envConfig.NATSConfig);
+var clientId = envConfig.isK8sEnv() ? `${process.env.HOSTNAME}` : "NE";
+
+logger.trace(JSON.stringify(envConfig.streamingConfig));
+let client = require('@appveen/data.stack-utils').streaming.init(
+	process.env.STREAMING_CHANNEL || 'datastack-cluster',
+	clientId,
+	envConfig.streamingConfig
+);
 let BATCH = envConfig.postHookBatch;
-
-
-function isK8sEnv() {
-    return process.env.KUBERNETES_SERVICE_HOST && process.env.KUBERNETES_SERVICE_PORT && process.env.ODPENV == "K8s";
-}
 
 cron.schedule("*/10 * * * * *", () => {
     natsScheduler();
@@ -67,8 +67,6 @@ client.on("reconnecting", function () {
 client.on("close", function () {
     logger.info("close");
 });
-
-logger.debug(JSON.stringify(envConfig.NATSConfig));
 
 /*function getQueue(priority, type) {
     var q = null;
