@@ -57,15 +57,15 @@ module.exports = {
     retryCollectionName: "retryCollection",
     isK8sEnv: isK8sEnv,
     streamingConfig: {
-			url: process.env.STREAMING_HOST || 'nats://127.0.0.1:4222',
-			user: process.env.STREAMING_USER || '',
-			pass: process.env.STREAMING_PASS || '',
-			// maxReconnectAttempts: process.env.STREAMING_RECONN_ATTEMPTS || 500,
-			// reconnectTimeWait: process.env.STREAMING_RECONN_TIMEWAIT_MILLI || 500
-			maxReconnectAttempts: process.env.STREAMING_RECONN_ATTEMPTS || 500,
-			connectTimeout: 2000,
-			stanMaxPingOut: process.env.STREAMING_RECONN_TIMEWAIT_MILLI || 500
-		},
+        url: process.env.STREAMING_HOST || "nats://127.0.0.1:4222",
+        user: process.env.STREAMING_USER || "",
+        pass: process.env.STREAMING_PASS || "",
+        // maxReconnectAttempts: process.env.STREAMING_RECONN_ATTEMPTS || 500,
+        // reconnectTimeWait: process.env.STREAMING_RECONN_TIMEWAIT_MILLI || 500
+        maxReconnectAttempts: process.env.STREAMING_RECONN_ATTEMPTS || 500,
+        connectTimeout: 2000,
+        stanMaxPingOut: process.env.STREAMING_RECONN_TIMEWAIT_MILLI || 500
+    },
     baseUrlUM: get("user") + "/rbac",
     eventsPostUrl: process.env.NE_EVENTS_URL || "",
     mongoUrl: mongoUrl(),

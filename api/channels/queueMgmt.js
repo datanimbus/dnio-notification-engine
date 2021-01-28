@@ -19,10 +19,10 @@ var retryCollection = envConfig.retryCollectionName;
 var clientId = envConfig.isK8sEnv() ? `${process.env.HOSTNAME}` : "NE";
 
 logger.trace(JSON.stringify(envConfig.streamingConfig));
-let client = require('@appveen/data.stack-utils').streaming.init(
-	process.env.STREAMING_CHANNEL || 'datastack-cluster',
-	clientId,
-	envConfig.streamingConfig
+let client = require("@appveen/data.stack-utils").streaming.init(
+    process.env.STREAMING_CHANNEL || "datastack-cluster",
+    clientId,
+    envConfig.streamingConfig
 );
 let BATCH = envConfig.postHookBatch;
 
