@@ -11,7 +11,7 @@ if (process.env.LOG_LEVEL == "DB_DEBUG") { process.env.LOG_LEVEL = "debug"; debu
 const utils = require("@appveen/utils");
 const envConfig = require("./config/config.js");
 
-let version = require('./package.json').version;
+let version = require("./package.json").version;
 const loggerName = envConfig.isK8sEnv() ? `[${process.env.DATA_STACK_NAMESPACE}] [${process.env.HOSTNAME}] [NE ${version}]` : `[NE ${version}]`;
 
 const log4js = utils.logger.getLogger;
