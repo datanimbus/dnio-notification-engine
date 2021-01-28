@@ -10,7 +10,10 @@ let debugDB = false;
 if (process.env.LOG_LEVEL == "DB_DEBUG") { process.env.LOG_LEVEL = "debug"; debugDB = true; }
 const utils = require("@appveen/utils");
 const envConfig = require("./config/config.js");
-const loggerName = envConfig.isK8sEnv() ? `[${process.env.HOSTNAME}] [${process.env.DATA_STACK_NAMESPACE}]` : "[notificationEngine]";
+
+let version = require('./package.json').version;
+const loggerName = envConfig.isK8sEnv() ? `[${process.env.DATA_STACK_NAMESPACE}] [${process.env.HOSTNAME}] [NE ${version}]` : `[NE ${version}]`;
+
 const log4js = utils.logger.getLogger;
 const logger = log4js.getLogger(loggerName);
 let timeOut = process.env.API_REQUEST_TIMEOUT || 120;
@@ -78,9 +81,9 @@ mongoose.connection.on("reconnectFailed", () => { logger.error("----------------
 var logMiddleware = utils.logMiddleware.getLogMiddleware(logger);
 app.use(logMiddleware);
 
-let odputils = require("@appveen/odp-utils");
+let dataStackUtils = require("@appveen/data.stack-utils");
 let queueMgmt = require("./api/channels/queueMgmt");
-let logToQueue = odputils.logToQueue("ne", queueMgmt.client, envConfig.queueNames.logQueueName, "ne.logs");
+let logToQueue = dataStackUtils.logToQueue("ne", queueMgmt.client, envConfig.queueNames.logQueueName, "ne.logs");
 app.use(logToQueue);
 
 // swaggerRouter configuration

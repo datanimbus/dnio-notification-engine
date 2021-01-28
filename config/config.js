@@ -1,6 +1,6 @@
 "use strict";
 const fs = require("fs");
-const odputils = require("@appveen/odp-utils");
+const dataStackUtils = require("@appveen/data.stack-utils");
 
 let log4js = require("log4js");
 const loggerName = isK8sEnv() ? `notificationEngine [${process.env.HOSTNAME}]` : "notificationEngine";
@@ -12,8 +12,8 @@ function mongoUrl() {
     mongoUrl += (process.env.MONGO_AUTHOR_DBNAME || "odpConfig");
     return mongoUrl;
 }
-if (process.env.KUBERNETES_SERVICE_HOST && process.env.KUBERNETES_SERVICE_PORT && process.env.ODPENV == "K8s") {
-    odputils.kubeutil.check()
+if (process.env.KUBERNETES_SERVICE_HOST && process.env.KUBERNETES_SERVICE_PORT) {
+    dataStackUtils.kubeutil.check()
         .then(
             logger.info("Connection to Kubernetes APi server successful!"),
             _e => {
@@ -23,7 +23,7 @@ if (process.env.KUBERNETES_SERVICE_HOST && process.env.KUBERNETES_SERVICE_PORT &
 }
 
 function isK8sEnv() {
-    return process.env.KUBERNETES_SERVICE_HOST && process.env.KUBERNETES_SERVICE_PORT && process.env.ODPENV == "K8s";
+    return process.env.KUBERNETES_SERVICE_HOST && process.env.KUBERNETES_SERVICE_PORT;
 }
 
 const dataStackNS = process.env.DATA_STACK_NAMESPACE;
@@ -56,16 +56,16 @@ function get(_service) {
 module.exports = {
     retryCollectionName: "retryCollection",
     isK8sEnv: isK8sEnv,
-    NATSConfig: {
-        uri: process.env.MESSAGING_HOST || "nats://127.0.0.1:4222",
-        user: process.env.MESSAGING_USER || "",
-        pass: process.env.MESSAGING_PASS || "",
-        // maxReconnectAttempts: process.env.MESSAGING_RECONN_ATTEMPTS || 500,
-        // reconnectTimeWait: process.env.MESSAGING_RECONN_TIMEWAIT_MILLI || 500
-        maxReconnectAttempts: process.env.MESSAGING_RECONN_ATTEMPTS || 500,
-        connectTimeout: 2000,
-        stanMaxPingOut: process.env.MESSAGING_RECONN_TIMEWAIT_MILLI || 500
-    },
+    streamingConfig: {
+			url: process.env.STREAMING_HOST || 'nats://127.0.0.1:4222',
+			user: process.env.STREAMING_USER || '',
+			pass: process.env.STREAMING_PASS || '',
+			// maxReconnectAttempts: process.env.STREAMING_RECONN_ATTEMPTS || 500,
+			// reconnectTimeWait: process.env.STREAMING_RECONN_TIMEWAIT_MILLI || 500
+			maxReconnectAttempts: process.env.STREAMING_RECONN_ATTEMPTS || 500,
+			connectTimeout: 2000,
+			stanMaxPingOut: process.env.STREAMING_RECONN_TIMEWAIT_MILLI || 500
+		},
     baseUrlUM: get("user") + "/rbac",
     eventsPostUrl: process.env.NE_EVENTS_URL || "",
     mongoUrl: mongoUrl(),

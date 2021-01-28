@@ -5,7 +5,7 @@ const definition = require("../helpers/webHooks.definition.js").definition;
 const SMCrud = require("@appveen/swagger-mongoose-crud");
 const utils = require("@appveen/utils");
 const schema = new mongoose.Schema(definition);
-const odputils = require("@appveen/odp-utils");
+const dataStackUtils = require("@appveen/data.stack-utils");
 let queueMgmt = require("../channels/queueMgmt");
 var client = queueMgmt.client;
 const logger = global.logger;
@@ -17,13 +17,13 @@ var options = {
 
 schema.pre("save", utils.counter.getIdGenerator("WHOOK", "webHook", null, null, 2000));
 
-schema.pre("save", odputils.auditTrail.getAuditPreSaveHook("webHook"));
+schema.pre("save", dataStackUtils.auditTrail.getAuditPreSaveHook("webHook"));
 
-schema.post("save", odputils.auditTrail.getAuditPostSaveHook("webHook.audit",client,"auditQueue"));
+schema.post("save", dataStackUtils.auditTrail.getAuditPostSaveHook("webHook.audit",client,"auditQueue"));
 
-schema.pre("remove", odputils.auditTrail.getAuditPreRemoveHook());
+schema.pre("remove", dataStackUtils.auditTrail.getAuditPreRemoveHook());
 
-schema.post("remove", odputils.auditTrail.getAuditPostRemoveHook("webHook.audit",client,"auditQueue"));
+schema.post("remove", dataStackUtils.auditTrail.getAuditPostRemoveHook("webHook.audit",client,"auditQueue"));
 
 var crudder = new SMCrud(schema, "webHook", options);
 
