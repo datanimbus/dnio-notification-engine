@@ -1,5 +1,4 @@
 "use strict";
-const fs = require("fs");
 const dataStackUtils = require("@appveen/data.stack-utils");
 
 let log4js = require("log4js");
@@ -29,22 +28,12 @@ function isK8sEnv() {
 const dataStackNS = process.env.DATA_STACK_NAMESPACE;
 if (isK8sEnv() && !dataStackNS) throw new Error("DATA_STACK_NAMESPACE not found. Please check your configMap");
 
-function getHostOSBasedLocation() {
-    if (process.env.PLATFORM == "NIX") return "localhost";
-    return "host.docker.internal";
-}
-
 function get(_service) {
     if (isK8sEnv()) {
         if (_service == "sm") return `http://sm.${dataStackNS}`;
         if (_service == "pm") return `http://pm.${dataStackNS}`;
         if (_service == "user") return `http://user.${dataStackNS}`;
         if (_service == "gw") return `http://gw.${dataStackNS}`;
-    } else if (fs.existsSync("/.dockerenv")) {
-        if (_service == "sm") return "http://" + getHostOSBasedLocation() + ":10003";
-        if (_service == "pm") return "http://" + getHostOSBasedLocation() + ":10011";
-        if (_service == "user") return "http://" + getHostOSBasedLocation() + ":10004";
-        if (_service == "gw") return "http://" + getHostOSBasedLocation() + ":9080";
     } else {
         if (_service == "sm") return "http://localhost:10003";
         if (_service == "pm") return "http://localhost:10011";
