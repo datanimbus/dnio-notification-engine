@@ -1,12 +1,5 @@
 "use strict";
 
-function mongoUrl() {
-    let mongoUrl = process.env.MONGO_AUTHOR_URL || "mongodb://localhost";
-    // if (!mongoUrl.endsWith("/")) mongoUrl += "/";
-    //  mongoUrl += (process.env.MONGO_AUTHOR_DBNAME || "datastackConfig");
-    return mongoUrl;
-}
-
 function isK8sEnv() {
     return process.env.KUBERNETES_SERVICE_HOST && process.env.KUBERNETES_SERVICE_PORT;
 }
@@ -43,7 +36,7 @@ module.exports = {
     },
     baseUrlUM: get("user") + "/rbac",
     eventsPostUrl: process.env.NE_EVENTS_URL || "",
-    mongoUrl: mongoUrl(),
+    mongoUrl: process.env.MONGO_AUTHOR_URL || "mongodb://localhost",
     validationApi: get("user") + "/rbac/validate",
     queueNames: {
         webHooks: "webHooks",
