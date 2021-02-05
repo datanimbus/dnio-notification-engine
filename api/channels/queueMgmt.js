@@ -102,7 +102,7 @@ function sendWebHooks() {
     opts.setStartWithLastReceived();
     opts.setDurableName("ne-durables");
     var subscription = client.subscribe(q, "sendWebHooks", opts);
-    logger.debug(`Subscribed to ${q}`)
+    logger.debug(`Subscribed to ${q}`);
     subscription.on("message", function (body) {
         var msgObj = JSON.parse(body.getData());
         if(msgObj.scheduleTime < Date.now() || !msgObj.scheduleTime)
@@ -131,7 +131,7 @@ function processWebHooks() {
         opts.setStartWithLastReceived();
         opts.setDurableName("ne-durabless");
         var subscription = client.subscribe(q, "processWebhooks", opts);
-        logger.debug(`Subscribed to ${q}`)
+        logger.debug(`Subscribed to ${q}`);
         subscription.on("message", function (body) {
             var msgObj = JSON.parse(body.getData());
             logger.info("WebHook, Attempt " + msgObj["retry"]);
@@ -163,7 +163,7 @@ function sendEventsUpdate() {
         opts.setStartWithLastReceived();
         opts.setDurableName("ne-durabless");
         var subscription = client.subscribe(q, "sendEventsUpdate", opts);
-        logger.debug(`Subscribed to ${q}`)
+        logger.debug(`Subscribed to ${q}`);
         subscription.on("message", function (body) {
             var eventData = JSON.parse(body.getData());
             logger.info("Message recieved in events q : " + body.getData());
