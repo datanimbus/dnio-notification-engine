@@ -812,22 +812,22 @@ paths:
   #         description: No document to list with the given parameter set.  
   #       '500':
   #         description: Internal server error
-  '/changeStream/{id}':
-    x-swagger-router-controller: controller
-    put:
-      description: callback response of webHook
-      operationId: changeStream
-      parameters:
-        - name: id
-          in: path
-          type: string
-          required: true
-          description: Id of the webHook to be displayed
-      responses:
-        '200':
-          description: List of the entites 
-        '500':
-          description: Internal server error
+  # '/changeStream/{id}':
+  #   x-swagger-router-controller: controller
+  #   put:
+  #     description: callback response of webHook
+  #     operationId: changeStream
+  #     parameters:
+  #       - name: id
+  #         in: path
+  #         type: string
+  #         required: true
+  #         description: Id of the webHook to be displayed
+  #     responses:
+  #       '200':
+  #         description: List of the entites 
+  #       '500':
+  #         description: Internal server error
   /logs:
     x-swagger-router-controller: controller
     get:
