@@ -105,7 +105,7 @@ function sendWebHooks() {
     subscription.on("message", function (body) {
         var msgObj = JSON.parse(body.getData());
         if(msgObj.scheduleTime < Date.now() || !msgObj.scheduleTime)
-          webHook.processMessageOnHooksChannel(JSON.parse(JSON.stringify(msgObj)), client);
+            webHook.processMessageOnHooksChannel(JSON.parse(JSON.stringify(msgObj)), client);
         else client.publish(envConfig.queueNames.webHooks, body.getData());
     });
 
