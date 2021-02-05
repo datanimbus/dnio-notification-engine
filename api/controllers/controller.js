@@ -1,11 +1,11 @@
 "use strict";
 //controllers
 const changeStreamController = require("./changeStream.controller.js");
-const entityController = require("./entity.controller.js");
+// const entityController = require("./entity.controller.js");
 const eventController = require("./event.controller.js");
 const subscriptionController = require("./subscription.controller.js");
 const templateController = require("./template.controller.js");
-const triggerEventController = require("./triggerEvent.controller.js");
+// const triggerEventController = require("./triggerEvent.controller.js");
 const webHooksController = require("./webHooks.controller.js");
 const webHooksAudit = require("./webHooks.audit.controller.js");
 const webHookStatusController = require("./webHookStatus.controller.js");
@@ -35,12 +35,12 @@ exports.subscriptionCount = subscriptionController.count;
 exports.subscriptionUpdateRecipients = subscriptionController.updateRecipients;
 exports.subscriptionRemoveRecipients = subscriptionController.removeRecipients;
 
-exports.triggerEvent = triggerEventController.processEvent;
+// exports.triggerEvent = triggerEventController.processEvent;
 
-exports.entityList = entityController.index;
-exports.entityShow = entityController.show;
-exports.entityUpdate = entityController.update;
-exports.entityCount = entityController.count;
+// exports.entityList = entityController.index;
+// exports.entityShow = entityController.show;
+// exports.entityUpdate = entityController.update;
+// exports.entityCount = entityController.count;
 
 exports.webHookCreate = webHooksController.create;
 exports.webHookList = webHooksController.index;

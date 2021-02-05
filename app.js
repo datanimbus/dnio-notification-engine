@@ -9,19 +9,21 @@ const app = express();
 let debugDB = false;
 if (process.env.LOG_LEVEL == "DB_DEBUG") { process.env.LOG_LEVEL = "debug"; debugDB = true; }
 const utils = require("@appveen/utils");
-const envConfig = require("./config/config.js");
+const config = require("./config/config.js");
 
 let version = require("./package.json").version;
-const loggerName = envConfig.isK8sEnv() ? `[${process.env.DATA_STACK_NAMESPACE}] [${process.env.HOSTNAME}] [NE ${version}]` : `[NE ${version}]`;
+const loggerName = config.isK8sEnv() ? `[${process.env.DATA_STACK_NAMESPACE}] [${process.env.HOSTNAME}] [NE ${version}]` : `[NE ${version}]`;
 
 const log4js = utils.logger.getLogger;
 const logger = log4js.getLogger(loggerName);
 let timeOut = process.env.API_REQUEST_TIMEOUT || 120;
-//logger.level = process.env.LOG_LEVEL ? process.env.LOG_LEVEL : "info";
+logger.level = process.env.LOG_LEVEL ? process.env.LOG_LEVEL : "info";
 const bluebird = require("bluebird");
 const mongoose = require("mongoose");
-const integration = require("./api/integrations/init");
-let conf = require("./config/config.js");
+
+// TODO: Delete this
+// const integration = require("./api/integrations/init");
+
 var bodyParser = require("body-parser");
 
 app.use(bodyParser.json({ limit: "5mb" }));
@@ -30,19 +32,16 @@ global.Promise = bluebird;
 global.logger = logger;
 mongoose.Promise = global.Promise;
 
-if (process.env.SERVICES) {
-    require("./supportServices/user")(10011);
-    require("./supportServices/product")(10012);
-    require("./supportServices/smsGateway")(10013);
-    require("./supportServices/webHookGateway")(10014);
-}
 
-if (envConfig.isK8sEnv()) {
+if (config.isK8sEnv()) {
     logger.info("*** K8s environment detected ***");
     logger.info("Image version: " + process.env.IMAGE_TAG);
 } else {
     logger.info("*** Local environment detected ***");
 }
+
+logger.info(`Hook :: Retry limit :: ${config.retryCounter.webHooks}`);
+logger.info(`Hook :: Retry delay :: ${config.retryDelay.webHooks}ms`);
 
 function customLogger(coll, op, doc, proj) {
     process.stdout.write(`Mongoose: ${coll}.${op}(${JSON.stringify(doc)}`);
@@ -53,35 +52,17 @@ function customLogger(coll, op, doc, proj) {
     }
 }
 
+// debugDB = true
 if (debugDB) mongoose.set("debug", customLogger);
 
-let mongoUrl = process.env.MONGO_AUTHOR_URL || "mongodb://localhost";
-
-mongoose.connect(mongoUrl, conf.mongoOptions, err => {
-    if (err) {
-        logger.error(err);
-    } else {
-        logger.info("Connected to DB");
-        logger.trace(`Connected to URL: ${mongoose.connection.host}`);
-        logger.trace(`Connected to DB:${mongoose.connection.name}`);
-        logger.trace(`Connected via User: ${mongoose.connection.user}`);
-        integration.init();
-    }
-});
-
-
-mongoose.connection.on("connecting", () => { logger.info("-------------------------connecting-------------------------"); });
-mongoose.connection.on("disconnected", () => { logger.error("-------------------------lost connection-------------------------"); });
-mongoose.connection.on("reconnect", () => { logger.info("-------------------------reconnected-------------------------"); });
-mongoose.connection.on("connected", () => { logger.info("-------------------------connected-------------------------"); });
-mongoose.connection.on("reconnectFailed", () => { logger.error("-------------------------failed to reconnect-------------------------"); });
+require("./db-factory");
 
 var logMiddleware = utils.logMiddleware.getLogMiddleware(logger);
 app.use(logMiddleware);
 
 let dataStackUtils = require("@appveen/data.stack-utils");
 let queueMgmt = require("./api/channels/queueMgmt");
-let logToQueue = dataStackUtils.logToQueue("ne", queueMgmt.client, envConfig.queueNames.logQueueName, "ne.logs");
+let logToQueue = dataStackUtils.logToQueue("ne", queueMgmt.client, config.queueNames.logQueueName, "ne.logs");
 app.use(logToQueue);
 
 // swaggerRouter configuration
