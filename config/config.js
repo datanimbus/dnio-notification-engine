@@ -2,8 +2,8 @@
 
 function mongoUrl() {
     let mongoUrl = process.env.MONGO_AUTHOR_URL || "mongodb://localhost";
-    if (!mongoUrl.endsWith("/")) mongoUrl += "/";
-    mongoUrl += (process.env.MONGO_AUTHOR_DBNAME || "datastackConfig");
+    // if (!mongoUrl.endsWith("/")) mongoUrl += "/";
+   //  mongoUrl += (process.env.MONGO_AUTHOR_DBNAME || "datastackConfig");
     return mongoUrl;
 }
 
