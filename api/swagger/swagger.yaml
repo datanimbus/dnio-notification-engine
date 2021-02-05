@@ -450,103 +450,103 @@ paths:
           description: Bad parameters
         '500':
           description: Internal server error
-  /entity:
-    x-swagger-router-controller: controller
-    get:
-      description: Retrieve a list of entity
-      operationId: entityList
-      parameters:
-        - name: page
-          in: query
-          type: integer
-          description: Page number of the request
-        - name: count
-          in: query
-          type: integer
-          description: Number of results per page
-        - name: filter
-          in: query
-          type: string
-          description: Filter results based on certain fields
-        - name: select
-          in: query
-          type: string
-          description: Comma seperated fields to be displayed
-        - name: sort
-          in: query
-          type: string
-          description: Sort parameters
-      responses:
-        '200':
-          description: List of the entites
-        '400':
-          description: Bad parameters
-        '500':
-          description: Internal server error
-  /entity/count:
-    x-swagger-router-controller: controller
-    get:
-      description: get count of entity
-      operationId: entityCount
-      parameters:
-        - name: filter
-          in: query
-          type: string
-          description: Filter results based on certain fields
-      responses:
-        '200':
-          description: List of the entites
-        '400':
-          description: Bad parameters
-        '500':
-          description: Internal server error          
-  '/entity/{id}':
-    x-swagger-router-controller: controller
-    get:
-      description: Retrieve an entity
-      operationId: entityShow
-      parameters:
-        - name: select
-          in: query
-          type: string
-          description: Comma seperated fields to be displayed
-        - name: id
-          in: path
-          type: string
-          required: true
-          description: Id of the object to be displayed
-      responses:
-        '200':
-          description: List of the entites
-        '400':
-          description: Bad parameters
-        '404':
-          description: No document to list with the given parameter set.  
-        '500':
-          description: Internal server error
-    put:
-      description: Update a entity
-      operationId: entityUpdate
-      parameters:
-        - name: data
-          in: body
-          description: Payload to update a event
-          schema:
-            $ref: '#/definitions/entityupdate'
-        - name: id
-          in: path
-          type: string
-          required: true
-          description: Id of the entity to be updated
-      responses:
-        '200':
-          description: List of the entites
-        '400':
-          description: Bad parameters
-        '404':
-          description: No document to update with the given parameter set.  
-        '500':
-          description: Internal server error
+  # /entity:
+  #   x-swagger-router-controller: controller
+  #   get:
+  #     description: Retrieve a list of entity
+  #     operationId: entityList
+  #     parameters:
+  #       - name: page
+  #         in: query
+  #         type: integer
+  #         description: Page number of the request
+  #       - name: count
+  #         in: query
+  #         type: integer
+  #         description: Number of results per page
+  #       - name: filter
+  #         in: query
+  #         type: string
+  #         description: Filter results based on certain fields
+  #       - name: select
+  #         in: query
+  #         type: string
+  #         description: Comma seperated fields to be displayed
+  #       - name: sort
+  #         in: query
+  #         type: string
+  #         description: Sort parameters
+  #     responses:
+  #       '200':
+  #         description: List of the entites
+  #       '400':
+  #         description: Bad parameters
+  #       '500':
+  #         description: Internal server error
+  # /entity/count:
+  #   x-swagger-router-controller: controller
+  #   get:
+  #     description: get count of entity
+  #     operationId: entityCount
+  #     parameters:
+  #       - name: filter
+  #         in: query
+  #         type: string
+  #         description: Filter results based on certain fields
+  #     responses:
+  #       '200':
+  #         description: List of the entites
+  #       '400':
+  #         description: Bad parameters
+  #       '500':
+  #         description: Internal server error          
+  # '/entity/{id}':
+  #   x-swagger-router-controller: controller
+  #   get:
+  #     description: Retrieve an entity
+  #     operationId: entityShow
+  #     parameters:
+  #       - name: select
+  #         in: query
+  #         type: string
+  #         description: Comma seperated fields to be displayed
+  #       - name: id
+  #         in: path
+  #         type: string
+  #         required: true
+  #         description: Id of the object to be displayed
+  #     responses:
+  #       '200':
+  #         description: List of the entites
+  #       '400':
+  #         description: Bad parameters
+  #       '404':
+  #         description: No document to list with the given parameter set.  
+  #       '500':
+  #         description: Internal server error
+  #   put:
+  #     description: Update a entity
+  #     operationId: entityUpdate
+  #     parameters:
+  #       - name: data
+  #         in: body
+  #         description: Payload to update a event
+  #         schema:
+  #           $ref: '#/definitions/entityupdate'
+  #       - name: id
+  #         in: path
+  #         type: string
+  #         required: true
+  #         description: Id of the entity to be updated
+  #     responses:
+  #       '200':
+  #         description: List of the entites
+  #       '400':
+  #         description: Bad parameters
+  #       '404':
+  #         description: No document to update with the given parameter set.  
+  #       '500':
+  #         description: Internal server error
   /webHook:
     x-swagger-router-controller: controller
     get:
@@ -738,80 +738,80 @@ paths:
           description: No records to list with the given parameter set.
         '500':
           description: Internal server error
-  /webHookStatus:
-    x-swagger-router-controller: controller
-    get:
-      description: Retrieve a list of webHookStatus
-      operationId: webHookStatusList
-      parameters:
-        - name: page
-          in: query
-          type: integer
-          description: Page number of the request
-        - name: count
-          in: query
-          type: integer
-          description: Number of results per page
-        - name: filter
-          in: query
-          type: string
-          description: Filter results based on certain fields
-        - name: select
-          in: query
-          type: string
-          description: Comma seperated fields to be displayed
-        - name: sort
-          in: query
-          type: string
-          description: Sort parameters
-      responses:
-        '200':
-          description: List of the entites
-        '400':
-          description: Bad parameters
-        '500':
-          description: Internal server error
-  /webHookStatus/count:
-    x-swagger-router-controller: controller
-    get:
-      description: get count of webHookStatus
-      operationId: webHookStatusCount
-      parameters:
-        - name: filter
-          in: query
-          type: string
-          description: Filter results based on certain fields
-      responses:
-        '200':
-          description: List of the entites
-        '400':
-          description: Bad parameters
-        '500':
-          description: Internal server error        
-  '/webHookStatus/{id}':
-    x-swagger-router-controller: controller
-    get:
-      description: Retrieve an webHookStatus
-      operationId: webHookStatusShow
-      parameters:
-        - name: select
-          in: query
-          type: string
-          description: Comma seperated fields to be displayed
-        - name: id
-          in: path
-          type: string
-          required: true
-          description: Id of the object to be displayed
-      responses:
-        '200':
-          description: List of the entites
-        '400':
-          description: Bad parameters
-        '404':
-          description: No document to list with the given parameter set.  
-        '500':
-          description: Internal server error
+  # /webHookStatus:
+  #   x-swagger-router-controller: controller
+  #   get:
+  #     description: Retrieve a list of webHookStatus
+  #     operationId: webHookStatusList
+  #     parameters:
+  #       - name: page
+  #         in: query
+  #         type: integer
+  #         description: Page number of the request
+  #       - name: count
+  #         in: query
+  #         type: integer
+  #         description: Number of results per page
+  #       - name: filter
+  #         in: query
+  #         type: string
+  #         description: Filter results based on certain fields
+  #       - name: select
+  #         in: query
+  #         type: string
+  #         description: Comma seperated fields to be displayed
+  #       - name: sort
+  #         in: query
+  #         type: string
+  #         description: Sort parameters
+  #     responses:
+  #       '200':
+  #         description: List of the entites
+  #       '400':
+  #         description: Bad parameters
+  #       '500':
+  #         description: Internal server error
+  # /webHookStatus/count:
+  #   x-swagger-router-controller: controller
+  #   get:
+  #     description: get count of webHookStatus
+  #     operationId: webHookStatusCount
+  #     parameters:
+  #       - name: filter
+  #         in: query
+  #         type: string
+  #         description: Filter results based on certain fields
+  #     responses:
+  #       '200':
+  #         description: List of the entites
+  #       '400':
+  #         description: Bad parameters
+  #       '500':
+  #         description: Internal server error        
+  # '/webHookStatus/{id}':
+  #   x-swagger-router-controller: controller
+  #   get:
+  #     description: Retrieve an webHookStatus
+  #     operationId: webHookStatusShow
+  #     parameters:
+  #       - name: select
+  #         in: query
+  #         type: string
+  #         description: Comma seperated fields to be displayed
+  #       - name: id
+  #         in: path
+  #         type: string
+  #         required: true
+  #         description: Id of the object to be displayed
+  #     responses:
+  #       '200':
+  #         description: List of the entites
+  #       '400':
+  #         description: Bad parameters
+  #       '404':
+  #         description: No document to list with the given parameter set.  
+  #       '500':
+  #         description: Internal server error
   '/changeStream/{id}':
     x-swagger-router-controller: controller
     put:

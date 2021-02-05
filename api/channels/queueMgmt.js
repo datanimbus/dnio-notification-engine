@@ -1,24 +1,17 @@
 "use strict";
-//var NATS = require('node-nats-streaming')
 var cron = require("node-cron");
-//const email = require("./email");
-// const sms = require("./sms");
 const webHook = require("./webHook");
 const Mongoose = require("mongoose");
 const envConfig = require("../../config/config");
 const request = require("request");
-//const webHookStatusController = require("../controllers/webHookStatus.controller");
+
 const logger = global.logger;
-var queueEmailP1 = envConfig.queueNames.email.p1;
-var queueEmailP2 = envConfig.queueNames.email.p2;
-var queueSMSP1 = envConfig.queueNames.sms.p1;
-var queueSMSP2 = envConfig.queueNames.sms.p2;
 var retryCollection = envConfig.retryCollectionName;
-//var client = NATS.connect('test-cluster', 'notification', envConfig.NATSConfig);
-//var client = require('node-nats-streaming').connect(config.cluster_id,config.client_id,config);
+
 var clientId = envConfig.isK8sEnv() ? `${process.env.HOSTNAME}` : "NE";
 
 logger.trace(JSON.stringify(envConfig.streamingConfig));
+
 let client = require("@appveen/data.stack-utils").streaming.init(
     process.env.STREAMING_CHANNEL || "datastack-cluster",
     clientId,
@@ -26,15 +19,13 @@ let client = require("@appveen/data.stack-utils").streaming.init(
 );
 let BATCH = envConfig.postHookBatch;
 
+global.streamingClient = client;
+
 cron.schedule("*/10 * * * * *", () => {
     natsScheduler();
 });
+
 client.on("connect", function () {
-    //logger.info("NATS connected");
-    //sendEmail(1);
-    //sendEmail(2);
-    //sendSMS(1);
-    //sendSMS(2);
     sendWebHooks();
     processWebHooks();
     sendEventsUpdate();
@@ -42,11 +33,6 @@ client.on("connect", function () {
 
 
 client.on("reconnect", function () {
-    //logger.info("NATS reconnected");
-    //sendEmail(1);
-    //sendEmail(2);
-    //sendSMS(1);
-    //sendSMS(2);
     sendWebHooks();
     processWebHooks();
     sendEventsUpdate();
@@ -68,65 +54,12 @@ client.on("close", function () {
     logger.info("close");
 });
 
-/*function getQueue(priority, type) {
-    var q = null;
-    if (type === "email") {
-        q = priority === 1 ? queueEmailP1 : queueEmailP2;
-    } else if (type === "sms") {
-        q = priority === 1 ? queueSMSP1 : queueSMSP2;
-    }
-    return q;
-}
-*/
+process.on("SIGTERM", () => {
+    client.close();
+});
+
 var e = {};
 
-e.queueEmail = (message, event) => {
-    var q = event.priority === 1 ? queueEmailP1 : queueEmailP2;
-    var obj = {};
-    obj["message"] = message;
-    obj["email"] = event.email;
-    obj["retryCounter"] = 1;
-    client.publish(q, JSON.stringify(obj, null, 4));
-};
-
-e.queueSMS = (message, event) => {
-    var q = event.priority === 1 ? queueSMSP1 : queueSMSP2;
-    var obj = {};
-    obj["message"] = message;
-    obj["from"] = event.sms.number;
-    obj["retryCounter"] = 1;
-    client.publish({ "queue": q }, JSON.stringify(obj, null, 4));
-};
-/*function requeue(msgObj, type, priority,times) {   
-    
-    var q = type === "webHook" ? 'retry/' +envConfig.queueNames.webHooks : getQueue(priority, type);
-    console.log();
-    
-    let retryCounter = 0;
-    if (type !== "webHook") {
-        retryCounter = priority === 1 ? envConfig.retryCounter[type]["p1"] : envConfig.retryCounter[type]["p2"];
-    } else {
-        retryCounter = parseInt(process.env.HOOK_RETRY) || envConfig.retryCounter.webHooks;
-    }
-    let retryDelay = 0;
-    if (type !== "webHook") {
-        retryDelay = priority === 1 ? envConfig.retryDelay[type]["p1"] : envConfig.retryDelay[type]["p2"];
-    } else {
-        retryDelay = envConfig.retryDelay.webHooks;
-    }
-    if (msgObj["retry"] >= retryCounter) {
-        if (type === "webHook") {
-            return logger.error("webHook " + msgObj.name + " failed permanently for entity " + msgObj.entity);
-        }
-        logger.error(type + " failed permanently");
-    }
-    client.subscribe('foo', function (body) {
-        arr.push(body);
-        console.log('array is ', arr);
-    });
-    client.publish('foo', JSON.stringify(msgObj, null, 4));
-    webHookStatusController.update(msgObj._id, { "status": "Pending" }).then();
-}*/
 function natsScheduler() {
     if (client) {
         let q = "retry_" + envConfig.queueNames.webHooks;
@@ -163,85 +96,6 @@ function natsScheduler() {
     }
 }
 
-// function sendEmail(priority) {
-//     var q = priority === 1 ? queueEmailP1 : queueEmailP2;
-//     client.subscribe(q, function (body) {
-//         var msgObj = JSON.parse(body);
-//         logger.info("Email, Attempt No ", msgObj["retryCounter"]);
-//         email.sendEmail(msgObj["message"], msgObj["email"])
-//             .then(() => {
-//                 logger.info("Email sent successfully!");
-//             }, err => {
-//                 logger.error(err.message);
-//                 requeue(msgObj, "email", priority);
-//             });
-//     });
-// }
-
-// function sendSMS(priority) {
-//     var q = priority === 2 ? queueSMSP2 : queueSMSP1;
-//     client.subscribe(q, function (body) {
-//         // console.log("SMS", body);
-//         var msgObj = JSON.parse(body);
-//         logger.info("SMS, Attempt No ", msgObj["retryCounter"]);
-//         sms.sendSMS(msgObj).then(() => {
-//             logger.info("SMS sent");
-//         }, err => {
-//             requeue(msgObj, "sms", 1);
-//             logger.error(err.message);
-//         });
-//     });
-// }
-
-
-/*function sendWebHooks() {
-    let q = envConfig.queueNames.webHooks;
-    client.subscribe(q, function (body) {
-        console.log('body====', body);
-        var msgObj = JSON.parse(body);
-        logger.info("WebHook, Attempt No 0");
-        webHook.invokeHook(JSON.parse(JSON.stringify(msgObj)))
-            /*.then((_result) => {
-                let successWebHook = _result.passed.map(_d => _d.name);
-                if (successWebHook)
-                    logger.info("Webhook triggered: " + successWebHook);
-                if (_result.failed) {
-                    _result.failed.forEach(fail => {
-                        logger.error("webHook " + fail.name + " failed for entity " + fail.entity);
-                        requeue(fail, "webHook");
-                    });
-                }
-            })
-            .catch(err => {
-                logger.error(err.message);
-            });
-    });
-}
-
-function retryWebHooks() {
-    let q = 'retry/' + envConfig.queueNames.webHooks;
-    client.subscribe(q, function (body) {
-        console.log('retry body',body);
-        var msgObj = JSON.parse(body);
-        logger.info("WebHook, Attempt No " + msgObj["retry"] + " name: " + msgObj["name"] + " entity: " + msgObj["entity"]);
-        webHook.retryInvokeHook(JSON.parse(JSON.stringify(msgObj)))
-            .then((_result) => {
-                let successWebHook = _result.passed.map(_d => _d.name);
-                if (successWebHook && successWebHook.length > 0)
-                    logger.info("Webhook triggered: " + successWebHook);
-                if (_result.failed) {
-                    _result.failed.forEach(fail => {
-                        logger.error("webHook " + fail.name + " failed for entity " + fail.entity);
-                        requeue(fail, "webHook");
-                    });
-                }
-            })
-            .catch(err => {
-                logger.error(err.message);
-            });
-    });
-}*/
-
 function sendWebHooks() {
     let q = envConfig.queueNames.webHooks;
     var opts = client.subscriptionOptions();
@@ -250,8 +104,9 @@ function sendWebHooks() {
     var subscription = client.subscribe(q, "sendWebHooks", opts);
     subscription.on("message", function (body) {
         var msgObj = JSON.parse(body.getData());
-        logger.debug("data for invoking hook", JSON.stringify(msgObj));
-        webHook.invokeHook(JSON.parse(JSON.stringify(msgObj)), client);
+        if(msgObj.scheduleTime < Date.now() || !msgObj.scheduleTime)
+          webHook.processMessageOnHooksChannel(JSON.parse(JSON.stringify(msgObj)), client);
+        else client.publish(envConfig.queueNames.webHooks, body.getData());
     });
 
 }
