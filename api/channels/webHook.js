@@ -37,7 +37,7 @@ e.processMessageOnHooksChannel = async (_data, _client) => {
         else {
             logger.error(`[${txnId}] [${_data._id}] Invoke hook :: Maximum retries reached`);
             apiCallResponse.message = "ERR_MAX_RETRY";
-            apiCallResponse.status = "Failed";
+            apiCallResponse.status = "Fail";
         }
         
         logger.trace(`[${txnId}] [${_data._id}] Invoke hook :: Response after update:: ${JSON.stringify(apiCallResponse)}`);

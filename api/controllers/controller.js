@@ -1,6 +1,6 @@
 "use strict";
 //controllers
-const changeStreamController = require("./changeStream.controller.js");
+// const changeStreamController = require("./changeStream.controller.js");
 // const entityController = require("./entity.controller.js");
 const eventController = require("./event.controller.js");
 const subscriptionController = require("./subscription.controller.js");
@@ -60,7 +60,7 @@ exports.webHookStatusList = webHookStatusController.index;
 exports.webHookStatusShow = webHookStatusController.show;
 exports.webHookStatusCount = webHookStatusController.count;
 
-exports.changeStream = changeStreamController.changeStream;
+// exports.changeStream = changeStreamController.changeStream;
 
 
 module.exports = exports;
