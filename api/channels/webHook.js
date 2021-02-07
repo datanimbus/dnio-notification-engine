@@ -41,7 +41,8 @@ e.processMessageOnHooksChannel = async (_data, _client) => {
         }
         
         logger.trace(`[${txnId}] [${_data._id}] Invoke hook :: Response after update:: ${JSON.stringify(apiCallResponse)}`);
-        await global.logsDB.collection(_data.collection).findOneAndUpdate({_id: _data._id}, {"$set": apiCallResponse});
+        if(hookData.disableInsights) await global.logsDB.collection(_data.collection).deleteOne({_id: _data._id});
+        else await global.logsDB.collection(_data.collection).findOneAndUpdate({_id: _data._id}, {"$set": apiCallResponse});
 
         if (apiCallResponse.retry <= config.retryCounter.webHooks && apiCallResponse.status == "Error") {
             logger.info(`[${txnId}] [${_data._id}] Invoke hook :: Retrying :: ${apiCallResponse.retry}`);
