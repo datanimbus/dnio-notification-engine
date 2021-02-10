@@ -11,13 +11,17 @@ const config = require("../../config/config");
 e.processMessageOnHooksChannel = async (_data, _client) => {
     let txnId = _data.txnId;
     try {
+        logger.debug(`[${txnId}] [${_data._id}] Invoke hook :: Q-data :: ${JSON.stringify(_data)}`);
         logger.info(`[${txnId}] [${_data._id}] Invoke hook :: ${_data._id}`);
         logger.debug(`[${txnId}] [${_data._id}] Invoke hook :: Collection :: ${_data.collection}`);
-        logger.trace(`[${txnId}] [${_data._id}] Invoke hook :: Q-data :: ${JSON.stringify(_data)}`);
-    
+        if(!_data.collection){
+            logger.info("Rejecting message");
+            return; 
+        }
+		
         let hookData = await global.logsDB.collection(_data.collection).findOne({ _id: _data._id });
         logger.trace(`[${txnId}] [${_data._id}] Invoke hook :: DB Data :: ${JSON.stringify(hookData)}`);
-    
+		
         let apiCallResponse = await postWebHook(hookData);
         logger.trace(`[${txnId}] [${_data._id}] Invoke hook :: Response :: ${JSON.stringify(apiCallResponse)}`);
 
@@ -26,7 +30,8 @@ e.processMessageOnHooksChannel = async (_data, _client) => {
         apiCallResponse["logs"] = hookData.logs;
         apiCallResponse.logs.push({
             time: apiCallResponse._metadata.lastUpdated,
-            message: apiCallResponse.message
+            message: apiCallResponse.message,
+            statusCode: apiCallResponse.statusCode
         });
 
         if (apiCallResponse.retry <= config.retryCounter.webHooks) {
@@ -39,9 +44,10 @@ e.processMessageOnHooksChannel = async (_data, _client) => {
             apiCallResponse.message = "ERR_MAX_RETRY";
             apiCallResponse.status = "Fail";
         }
-        
+				
         logger.trace(`[${txnId}] [${_data._id}] Invoke hook :: Response after update:: ${JSON.stringify(apiCallResponse)}`);
-        await global.logsDB.collection(_data.collection).findOneAndUpdate({_id: _data._id}, {"$set": apiCallResponse});
+        if(hookData.disableInsights) await global.logsDB.collection(_data.collection).deleteOne({_id: _data._id});
+        else await global.logsDB.collection(_data.collection).findOneAndUpdate({_id: _data._id}, {"$set": apiCallResponse});
 
         if (apiCallResponse.retry <= config.retryCounter.webHooks && apiCallResponse.status == "Error") {
             logger.info(`[${txnId}] [${_data._id}] Invoke hook :: Retrying :: ${apiCallResponse.retry}`);
@@ -83,8 +89,13 @@ async function postWebHook(_data) {
 
         let responseData = {
             status: "Error",
-            message: null,
-            retry: _data.retry
+            statusCode: response.statusCode,
+            message: response.body.message,
+            retry: _data.retry,
+            response: {
+                headers: response.headers,
+                body: response.body
+            }
         };
         if (response.statusCode == 200) responseData.status = "Completed";
         else if (response.statusCode == 202) responseData.status = "Requested";
@@ -101,7 +112,12 @@ async function postWebHook(_data) {
         let responseData = {
             retry: _data.retry + 1,
             status: "Error",
+            statusCode: err.response.statusCode,
             message: err.message,
+            response: {
+                headers: err.response.headers,
+                body: err.response.body
+            }
         };
         return responseData;
     }
