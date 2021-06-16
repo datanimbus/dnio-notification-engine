@@ -1,5 +1,6 @@
 // const mongoose = require("mongoose");
 //const webHookStatusController = require("../controllers/webHookStatus.controller");
+const Mongoose = require("mongoose");
 const request = require("request-promise");
 var e = {};
 const logger = global.logger;
@@ -14,14 +15,23 @@ e.processMessageOnHooksChannel = async (_data, _client) => {
         logger.debug(`[${txnId}] [${_data._id}] Invoke hook :: Q-data :: ${JSON.stringify(_data)}`);
         logger.info(`[${txnId}] [${_data._id}] Invoke hook :: ${_data._id}`);
         logger.debug(`[${txnId}] [${_data._id}] Invoke hook :: Collection :: ${_data.collection}`);
-        if(!_data.collection){
+        if (!_data.collection) {
             logger.info("Rejecting message");
-            return; 
+            return;
         }
-		
+
         let hookData = await global.logsDB.collection(_data.collection).findOne({ _id: _data._id });
         logger.trace(`[${txnId}] [${_data._id}] Invoke hook :: DB Data :: ${JSON.stringify(hookData)}`);
-		
+
+        if (hookData.hookType === "function") {
+            logger.info(`[${txnId}] [${_data._id}] Hook Found is FAAS`);
+            const doc = await Mongoose.connection.db.collection("faas").findOne({ _id: hookData.refId });
+            if (!doc) {
+                throw new Error(`${hookData.refId} FAAS NOT FOUND`);
+            }
+            hookData.url = `http://${doc.deploymentName}.${doc.namespace}/api/post`;
+        }
+
         let apiCallResponse = await postWebHook(hookData);
         logger.trace(`[${txnId}] [${_data._id}] Invoke hook :: Response :: ${JSON.stringify(apiCallResponse)}`);
 
@@ -44,10 +54,10 @@ e.processMessageOnHooksChannel = async (_data, _client) => {
             apiCallResponse.message = "ERR_MAX_RETRY";
             apiCallResponse.status = "Fail";
         }
-				
+
         logger.trace(`[${txnId}] [${_data._id}] Invoke hook :: Response after update:: ${JSON.stringify(apiCallResponse)}`);
-        if(hookData.disableInsights) await global.logsDB.collection(_data.collection).deleteOne({_id: _data._id});
-        else await global.logsDB.collection(_data.collection).findOneAndUpdate({_id: _data._id}, {"$set": apiCallResponse});
+        if (hookData.disableInsights) await global.logsDB.collection(_data.collection).deleteOne({ _id: _data._id });
+        else await global.logsDB.collection(_data.collection).findOneAndUpdate({ _id: _data._id }, { "$set": apiCallResponse });
 
         if (apiCallResponse.retry <= config.retryCounter.webHooks && apiCallResponse.status == "Error") {
             logger.info(`[${txnId}] [${_data._id}] Invoke hook :: Retrying :: ${apiCallResponse.retry}`);
