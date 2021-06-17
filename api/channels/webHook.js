@@ -29,7 +29,7 @@ e.processMessageOnHooksChannel = async (_data, _client) => {
             if (!doc) {
                 throw new Error(`${hookData.refId} FAAS NOT FOUND`);
             }
-            hookData.url = `http://${doc.deploymentName}.${doc.namespace}/api/post`;
+            hookData.url = `http://${doc.deploymentName}.${doc.namespace}/api`;
         }
 
         let apiCallResponse = await postWebHook(hookData);
