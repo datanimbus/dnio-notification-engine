@@ -2,6 +2,7 @@
 //const webHookStatusController = require("../controllers/webHookStatus.controller");
 const Mongoose = require("mongoose");
 const request = require("request-promise");
+const _ = require("lodash");
 var e = {};
 const logger = global.logger;
 const config = require("../../config/config");
@@ -29,7 +30,7 @@ e.processMessageOnHooksChannel = async (_data, _client) => {
             if (!doc) {
                 throw new Error(`${hookData.refId} FAAS NOT FOUND`);
             }
-            hookData.url = `http://${doc.deploymentName}.${doc.namespace}/api`;
+            hookData.url = `http://${doc.deploymentName}.${doc.namespace}/api/${doc.app}/${_.camelCase(doc.name)}`;
         }
 
         let apiCallResponse = await postWebHook(hookData);
