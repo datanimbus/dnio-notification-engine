@@ -101,7 +101,7 @@ async function postWebHook(_data) {
         let responseData = {
             status: "Error",
             statusCode: response.statusCode,
-            message: response.body ? response.body.message : 'Success - No Body',
+            message: response.body ? response.body.message : "Success - No Body",
             retry: _data.retry,
             response: {
                 headers: response.headers,
@@ -130,7 +130,7 @@ async function postWebHook(_data) {
             }
         };
         logger.error(`[${txnId}] [${_data._id}] Error invoking hook :: ${_data.url} :: ${err.message}`);
-        if (typeof err === 'string') {
+        if (typeof err === "string") {
             responseData.statusCode = 500;
             responseData.message = err;
             responseData.response = {};
