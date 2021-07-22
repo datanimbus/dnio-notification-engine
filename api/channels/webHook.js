@@ -101,7 +101,7 @@ async function postWebHook(_data) {
         let responseData = {
             status: "Error",
             statusCode: response.statusCode,
-            message: response.body.message,
+            message: response.body ? response.body.message : 'Success - No Body',
             retry: _data.retry,
             response: {
                 headers: response.headers,
@@ -119,7 +119,6 @@ async function postWebHook(_data) {
         logger.debug(`[${txnId}] [${_data._id}] Hook response :: data :: ${JSON.stringify(responseData)}`);
         return responseData;
     } catch (err) {
-        logger.error(`[${txnId}] [${_data._id}] Error invoking hook :: ${_data.url} :: ${err.message}`);
         let responseData = {
             retry: _data.retry + 1,
             status: "Error",
@@ -130,6 +129,25 @@ async function postWebHook(_data) {
                 body: err.response.body
             }
         };
+        logger.error(`[${txnId}] [${_data._id}] Error invoking hook :: ${_data.url} :: ${err.message}`);
+        if (typeof err === 'string') {
+            responseData.statusCode = 500;
+            responseData.message = err;
+            responseData.response = {};
+        } else {
+            if (err.response) {
+                responseData.statusCode = err.response.statusCode;
+                responseData.message = err.response.body ? err.response.body.message : err.message;
+                responseData.response = {
+                    headers: err.response.headers,
+                    body: err.response.body
+                };
+            } else {
+                responseData.statusCode = 500;
+                responseData.message = err.message;
+                responseData.response = {};
+            }
+        }
         return responseData;
     }
 
