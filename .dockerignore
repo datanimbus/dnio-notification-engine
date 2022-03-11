@@ -1,0 +1,14 @@
+.dockerignore
+.eslintrc.js
+.eslintrc.yml
+.git
+.gitignore
+.huskyrc
+.jshintrc
+CONTRIBUTORS.md
+Dockerfile
+README.md
+VERSION
+build
+ne.yaml
+node_modules

@@ -1,23 +1,24 @@
 "use strict";
-var cron = require("node-cron");
-const webHook = require("./webHook");
+let cron = require("node-cron");
 const Mongoose = require("mongoose");
-const envConfig = require("../../config/config");
 const request = require("request");
+const log4js = require("log4js");
+const config = require("./config");
+const webHookUtils = require("./utils/web-hook.utils");
 
-const logger = global.logger;
-var retryCollection = envConfig.retryCollectionName;
+const logger = log4js.getLogger(global.loggerName);
+const retryCollection = config.retryCollectionName;
 
-var clientId = envConfig.isK8sEnv() ? `${process.env.HOSTNAME}` : "NE";
+const clientId = config.isK8sEnv() ? `${process.env.HOSTNAME}` : "NE";
 
-logger.trace(JSON.stringify(envConfig.streamingConfig));
+logger.trace(JSON.stringify(config.streamingConfig));
 
-let client = require("@appveen/data.stack-utils").streaming.init(
+const client = require("@appveen/data.stack-utils").streaming.init(
     process.env.STREAMING_CHANNEL || "datastack-cluster",
     clientId,
-    envConfig.streamingConfig
+    config.streamingConfig
 );
-let BATCH = envConfig.postHookBatch;
+const BATCH = config.postHookBatch;
 
 global.streamingClient = client;
 
@@ -58,11 +59,11 @@ process.on("SIGTERM", () => {
     client.close();
 });
 
-var e = {};
+let e = {};
 
 function natsScheduler() {
     if (client) {
-        let q = "retry_" + envConfig.queueNames.webHooks;
+        let q = "retry_" + config.queueNames.webHooks;
         Mongoose.connection.db.collection(retryCollection).count()
             .then(count => {
                 if (count > 0) {
@@ -97,23 +98,23 @@ function natsScheduler() {
 }
 
 function sendWebHooks() {
-    let q = envConfig.queueNames.webHooks;
-    var opts = client.subscriptionOptions();
+    let q = config.queueNames.webHooks;
+    let opts = client.subscriptionOptions();
     opts.setStartWithLastReceived();
     opts.setDurableName("ne-durables");
-    var subscription = client.subscribe(q, "sendWebHooks", opts);
+    let subscription = client.subscribe(q, "sendWebHooks", opts);
     logger.debug(`Subscribed to ${q}`);
     subscription.on("message", function (body) {
-        var msgObj = JSON.parse(body.getData());
-        if(msgObj.scheduleTime < Date.now() || !msgObj.scheduleTime)
-            webHook.processMessageOnHooksChannel(JSON.parse(JSON.stringify(msgObj)), client);
-        else client.publish(envConfig.queueNames.webHooks, body.getData());
+        let msgObj = JSON.parse(body.getData());
+        if (msgObj.scheduleTime < Date.now() || !msgObj.scheduleTime)
+            webHookUtils.processMessageOnHooksChannel(JSON.parse(JSON.stringify(msgObj)), client);
+        else client.publish(config.queueNames.webHooks, body.getData());
     });
 
 }
 
 function requeue(element) {
-    let retryCounter = envConfig.retryCounter.webHooks;
+    let retryCounter = config.retryCounter.webHooks;
     if (element["retry"] < retryCounter - 1) {
         element["status"] = "Pending";
     }
@@ -126,16 +127,16 @@ function requeue(element) {
 
 function processWebHooks() {
     if (client) {
-        let q = "retry_" + envConfig.queueNames.webHooks;
-        var opts = client.subscriptionOptions();
+        let q = "retry_" + config.queueNames.webHooks;
+        let opts = client.subscriptionOptions();
         opts.setStartWithLastReceived();
         opts.setDurableName("ne-durabless");
-        var subscription = client.subscribe(q, "processWebhooks", opts);
+        let subscription = client.subscribe(q, "processWebhooks", opts);
         logger.debug(`Subscribed to ${q}`);
         subscription.on("message", function (body) {
-            var msgObj = JSON.parse(body.getData());
+            let msgObj = JSON.parse(body.getData());
             logger.info("WebHook, Attempt " + msgObj["retry"]);
-            webHook.retryInvokeHook(JSON.parse(JSON.stringify(msgObj)), client)
+            webHookUtils.retryInvokeHook(JSON.parse(JSON.stringify(msgObj)), client)
                 .then((_result) => {
                     logger.debug("result after invoking hook", JSON.stringify(_result));
                     let successWebHook = _result.passed.map(_d => _d.name);
@@ -158,15 +159,15 @@ function processWebHooks() {
 
 function sendEventsUpdate() {
     if (client) {
-        let q = envConfig.queueNames.eventsQueue;
-        var opts = client.subscriptionOptions();
+        let q = config.queueNames.eventsQueue;
+        let opts = client.subscriptionOptions();
         opts.setStartWithLastReceived();
         opts.setDurableName("ne-durabless");
-        var subscription = client.subscribe(q, "sendEventsUpdate", opts);
+        let subscription = client.subscribe(q, "sendEventsUpdate", opts);
         logger.debug(`Subscribed to ${q}`);
         subscription.on("message", function (body) {
-            var eventData = JSON.parse(body.getData());
-            logger.info("Message recieved in events q : " + body.getData());
+            let eventData = JSON.parse(body.getData());
+            logger.debug("Message recieved in events q : " + body.getData());
             postEventData(eventData);
         });
     } else {
@@ -175,9 +176,9 @@ function sendEventsUpdate() {
 }
 
 function postEventData(eventData) {
-    let url = envConfig.eventsPostUrl;
+    let url = config.eventsPostUrl;
     if (url && url != "" && url != "__NE_EVENTS_URL__") {
-        var options = {
+        let options = {
             url: url,
             method: "POST",
             json: true,
@@ -188,7 +189,7 @@ function postEventData(eventData) {
         };
         request.post(options, function (err, res, body) {
             if (err) {
-                logger.error(e);
+                logger.error(err);
                 logEvents(eventData, null, err, "failed", "Error in NE_EVENTS_URL api call");
             } else if (!res) {
                 logger.error("No response from event post URL");
@@ -205,9 +206,9 @@ function postEventData(eventData) {
 }
 
 function logEvents(eventData, statusCode, body, status, message) {
-    let q = envConfig.queueNames.logEventsQueue;
+    let q = config.queueNames.logEventsQueue;
     let qPayload = {
-        url: envConfig.eventsPostUrl,
+        url: config.eventsPostUrl,
         data: eventData,
         resStatusCOde: statusCode,
         resBody: body,
