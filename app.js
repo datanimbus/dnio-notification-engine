@@ -17,7 +17,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: "5mb" }));
 
 app.use(function (req, res, next) {
-    logger.info("Request Recieved", req.method, req.path);
+    if (req.path.indexOf('health') == -1) {
+        logger.info("Request Recieved", req.method, req.path);
+    }
     next();
 });
 
