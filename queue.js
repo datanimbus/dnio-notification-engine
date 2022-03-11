@@ -20,8 +20,6 @@ const client = require("@appveen/data.stack-utils").streaming.init(
 );
 const BATCH = config.postHookBatch;
 
-global.streamingClient = client;
-
 cron.schedule("*/10 * * * * *", () => {
     natsScheduler();
 });
@@ -53,13 +51,12 @@ client.on("reconnecting", function () {
 
 client.on("close", function () {
     logger.info("close");
+    process.exit(0);
 });
 
 process.on("SIGTERM", () => {
     client.close();
 });
-
-let e = {};
 
 function natsScheduler() {
     if (client) {
@@ -218,6 +215,5 @@ function logEvents(eventData, statusCode, body, status, message) {
     };
     client.publish(q, JSON.stringify(qPayload));
 }
-e.client = client;
-e.requeue = requeue;
-module.exports = e;
+
+module.exports.client = client;
