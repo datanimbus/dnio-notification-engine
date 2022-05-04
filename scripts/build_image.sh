@@ -82,7 +82,6 @@ if [ -f $WORKSPACE/../CLEAN_BUILD_NE ]; then
 
     if [ $CICD ]; then
         sed -i.bak s#__docker_registry_server__#$DOCKER_REG# ne.yaml
-        sed -i.bak s/__release_tag__/"'$REL'"/ ne.yaml
         sed -i.bak s#__release__#$TAG# ne.yaml
         sed -i.bak s#__namespace__#$DATA_STACK_NS# ne.yaml
         sed -i.bak '/imagePullSecrets/d' ne.yaml

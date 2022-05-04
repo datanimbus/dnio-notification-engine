@@ -7,7 +7,6 @@ spec:
   type: ClusterIP
   selector:
     app: ne
-    release: __release_tag__
   ports:
     - protocol: TCP
       port: 80
@@ -23,33 +22,30 @@ spec:
   selector:
     matchLabels:
       app: ne
-      release: __release_tag__
   template:
     metadata:
       labels:
         app: ne
-        release: __release_tag__
     spec:
       containers:
         - name: ne
-          image: '__docker_registry_server__/data.stack:ne.__release__'
+          image: "__docker_registry_server__/data.stack:ne.__release__"
           ports:
             - containerPort: 10010
           livenessProbe:
             httpGet:
-              path: /ne/health/live
+              path: /ne/internal/health/live
               port: 10010
             initialDelaySeconds: 10
             periodSeconds: 10
           readinessProbe:
             httpGet:
-              path: /ne/health/ready
+              path: /ne/internal/health/ready
               port: 10010
             initialDelaySeconds: 10
             periodSeconds: 10
           envFrom:
-          - configMapRef:
-              name: config
+            - configMapRef:
+                name: config
       imagePullSecrets:
-        - name: regsecret        
-
+        - name: regsecret
