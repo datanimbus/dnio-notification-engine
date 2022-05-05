@@ -23,7 +23,7 @@ async function processMessageOnHooksChannel(data, client) {
 
         if (hookData.hookType === "function") {
             logger.info(`[${txnId}] [${data._id}] Hook Found is FAAS`);
-            const doc = await Mongoose.connection.db.collection("faas").findOne({ _id: hookData.refId });
+            const doc = await Mongoose.connection.db.collection("b2b.faas").findOne({ _id: hookData.refId });
             if (!doc) {
                 throw new Error(`${hookData.refId} FAAS NOT FOUND`);
             }
