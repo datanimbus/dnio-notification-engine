@@ -23,11 +23,11 @@ async function processMessageOnHooksChannel(data, client) {
 
         if (hookData.hookType === "function") {
             logger.info(`[${txnId}] [${data._id}] Hook Found is FAAS`);
-            const doc = await Mongoose.connection.db.collection("faas").findOne({ _id: hookData.refId });
+            const doc = await Mongoose.connection.db.collection("b2b.faas").findOne({ _id: hookData.refId });
             if (!doc) {
                 throw new Error(`${hookData.refId} FAAS NOT FOUND`);
             }
-            hookData.url = `http://${doc.deploymentName}.${doc.namespace}/api/${doc.app}/${_.camelCase(doc.name)}`;
+            hookData.url = `http://${doc.deploymentName}.${doc.namespace}/api/faas/${doc.app}/${_.camelCase(doc.name)}`;
         }
 
         let apiCallResponse = await postWebHook(hookData);
