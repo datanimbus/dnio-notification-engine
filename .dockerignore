@@ -11,4 +11,5 @@ README.md
 VERSION
 build
 ne.yaml
+package-lock.json
 node_modules
