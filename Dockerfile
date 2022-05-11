@@ -8,7 +8,7 @@ WORKDIR /app
 
 COPY package.json package.json
 
-RUN npm install -g npm
+RUN npm install -g npm@8.10.0
 RUN npm install --production
 RUN npm audit fix
 RUN rm -rf /usr/local/lib/node_modules/npm/node_modules/node-gyp/test
