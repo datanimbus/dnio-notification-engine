@@ -9,7 +9,11 @@ echo "data.stack:ne :: Building NE using TAG :: $TAG"
 echo "****************************************************"
 
 
-docker build -t data.stack.ne:$TAG .
+if [ $cleanBuild ]; then
+    docker build --no-cache -t data.stack.ne:$TAG .
+else 
+    docker build -t data.stack.ne:$TAG .
+fi
 
 
 echo "****************************************************"
