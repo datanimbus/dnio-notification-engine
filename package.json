@@ -14,10 +14,10 @@
   "dependencies": {
     "@appveen/data.stack-utils": "^1.0.17",
     "@appveen/swagger-mongoose-crud": "1.2.9",
-    "@appveen/utils": "^2.1.6",
+    "@appveen/utils": "^2.1.7",
     "express": "^4.18.1",
     "lodash": "^4.17.21",
-    "log4js": "^6.4.6",
+    "log4js": "^6.5.2",
     "mongoose": "^5.13.14",
     "node-cron": "^3.0.0",
     "request": "^2.88.2",
