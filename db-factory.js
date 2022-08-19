@@ -27,13 +27,14 @@ logsDB.on("reconnectFailed", () => { logger.error(` *** ${logsDBName} FAILED TO 
 global.logsDB = logsDB;
 
 const dbName = config.mongoOptions.dbName;
-mongoose.connect(config.mongoUrl, config.mongoOptions, err => {
-    if (err) {
-        logger.error(err);
-    } else {
+(async () => {
+    try {
+        await mongoose.connect(config.mongoUrl, config.mongoOptions);
         logger.info(`Connected to ${dbName} DB`);
+    } catch (err) {
+        logger.error(err);
     }
-});
+})();
 
 mongoose.connection.on("connecting", () => { logger.info(` *** ${dbName} CONNECTING *** `); });
 mongoose.connection.on("disconnected", () => { logger.error(` *** ${dbName} LOST CONNECTION *** `); });
