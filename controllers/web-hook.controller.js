@@ -107,15 +107,6 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
     try {
         const payload = req.body;
-        const key = payload.jsonSchema.title.toCamelCase();
-        logger.info(key);
-        let doc = await webHookModel.findOne({ key });
-        if (doc) {
-            return res.status(400).json({
-                message: "Web Hook with Same Key Exist"
-            });
-        }
-        payload.key = key;
         doc = new webHookModel(payload);
         const status = await doc.save(req);
         res.status(200).json(status);

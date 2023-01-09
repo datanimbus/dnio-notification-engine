@@ -1,14 +1,14 @@
 "use strict";
 
 const mongoose = require("mongoose");
-const SMCrud = require("@appveen/swagger-mongoose-crud");
+const { SMCrud, MakeSchema } = require('@appveen/swagger-mongoose-crud');
 const utils = require("@appveen/utils");
 const dataStackUtils = require("@appveen/data.stack-utils");
 
 const queue = require("../queue");
 const definition = require("../schema/web-hook.schema").definition;
 
-const schema = new mongoose.Schema(definition);
+const schema = MakeSchema(definition);
 const client = queue.client;
 const logger = global.logger;
 

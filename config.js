@@ -61,15 +61,15 @@ module.exports = {
         webHooks: parseInt(process.env.HOOK_DELAY) || 10000
     },
     mongoOptions: {
-        reconnectTries: process.env.MONGO_RECONN_TRIES,
-        reconnectInterval: process.env.MONGO_RECONN_TIME_MILLI,
+        // reconnectTries: process.env.MONGO_RECONN_TRIES,
+        // reconnectInterval: process.env.MONGO_RECONN_TIME_MILLI,
         dbName: process.env.MONGO_AUTHOR_DBNAME || "datastackConfig",
         useNewUrlParser: true
     },
     mongoLogUrl: process.env.MONGO_LOGS_URL || "mongodb://localhost",
     mongoLogsOptions: {
-        reconnectTries: process.env.MONGO_RECONN_TRIES,
-        reconnectInterval: process.env.MONGO_RECONN_TIME_MILLI,
+        // reconnectTries: process.env.MONGO_RECONN_TRIES,
+        // reconnectInterval: process.env.MONGO_RECONN_TIME_MILLI,
         dbName: process.env.MONGO_LOGS_DBNAME || "datastackLogs",
         useNewUrlParser: true
     },
