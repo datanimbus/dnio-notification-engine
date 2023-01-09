@@ -13,8 +13,8 @@
   "license": "ISC",
   "dependencies": {
     "@appveen/data.stack-utils": "^1.0.17",
-    "@appveen/swagger-mongoose-crud": "github:appveen/swagger-mongoose-crud",
-    "@appveen/utils": "https://github.com/appveen/utils.git",
+    "@appveen/swagger-mongoose-crud": "^2.0.1",
+    "@appveen/utils": "^2.1.13",
     "express": "^4.18.1",
     "lodash": "^4.17.21",
     "log4js": "^6.5.2",
