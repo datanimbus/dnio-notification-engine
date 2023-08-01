@@ -5,12 +5,12 @@ set -e
 TAG=`cat CURRENT_NE`
 
 echo "****************************************************"
-echo "data.stack:ne :: Pushing Image to Docker Hub :: appveen/data.stack.ne:$TAG"
+echo "datanimbus.io.ne :: Pushing Image to Docker Hub :: appveen/datanimbus.io.ne:$TAG"
 echo "****************************************************"
 
-docker tag data.stack.ne:$TAG appveen/data.stack.ne:$TAG
-docker push appveen/data.stack.ne:$TAG
+docker tag datanimbus.io.ne:$TAG appveen/datanimbus.io.ne:$TAG
+docker push appveen/datanimbus.io.ne:$TAG
 
 echo "****************************************************"
-echo "data.stack:ne :: Image Pushed to Docker Hub AS appveen/data.stack.ne:$TAG"
+echo "datanimbus.io.ne :: Image Pushed to Docker Hub AS appveen/datanimbus.io.ne:$TAG"
 echo "****************************************************"

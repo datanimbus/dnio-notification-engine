@@ -5,20 +5,20 @@ set -e
 TAG=`cat CURRENT_NE`
 
 echo "****************************************************"
-echo "data.stack:ne :: Building NE using TAG :: $TAG"
+echo "datanimbus.io.ne :: Building NE using TAG :: $TAG"
 echo "****************************************************"
 
 sed -i.bak s#__image_tag__#$TAG# Dockerfile
 
 if $cleanBuild ; then
-    docker build --no-cache -t data.stack.ne:$TAG .
+    docker build --no-cache -t datanimbus.io.ne:$TAG .
 else 
-    docker build -t data.stack.ne:$TAG .
+    docker build -t datanimbus.io.ne:$TAG .
 fi
 
 
 echo "****************************************************"
-echo "data.stack:ne :: NE Built using TAG :: $TAG"
+echo "datanimbus.io.ne :: NE Built using TAG :: $TAG"
 echo "****************************************************"
 
 

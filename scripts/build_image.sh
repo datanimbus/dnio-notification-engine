@@ -2,8 +2,8 @@
 set -e
 if [ -f $WORKSPACE/../TOGGLE ]; then
     echo "****************************************************"
-    echo "data.stack.ne :: Toggle mode is on, terminating build"
-    echo "data.stack.ne :: BUILD CANCLED"
+    echo "datanimbus.io.ne :: Toggle mode is on, terminating build"
+    echo "datanimbus.io.ne :: BUILD CANCLED"
     echo "****************************************************"
     exit 0
 fi
@@ -28,8 +28,8 @@ if [ $1 ]; then
 fi
 if [ ! $REL ]; then
     echo "****************************************************"
-    echo "data.stack.ne :: Please Create file DATA_STACK_RELEASE with the releaese at $WORKSPACE or provide it as 1st argument of this script."
-    echo "data.stack.ne :: BUILD FAILED"
+    echo "datanimbus.io.ne :: Please Create file DATA_STACK_RELEASE with the releaese at $WORKSPACE or provide it as 1st argument of this script."
+    echo "datanimbus.io.ne :: BUILD FAILED"
     echo "****************************************************"
     exit 0
 fi
@@ -42,13 +42,13 @@ if [ $3 ]; then
 fi
 if [ $CICD ]; then
     echo "****************************************************"
-    echo "data.stack.ne :: CICI env found"
+    echo "datanimbus.io.ne :: CICI env found"
     echo "****************************************************"
     TAG=$TAG"_"$cDate
     if [ ! -f $WORKSPACE/../DATA_STACK_NAMESPACE ]; then
         echo "****************************************************"
-        echo "data.stack.ne :: Please Create file DATA_STACK_NAMESPACE with the namespace at $WORKSPACE"
-        echo "data.stack.ne :: BUILD FAILED"
+        echo "datanimbus.io.ne :: Please Create file DATA_STACK_NAMESPACE with the namespace at $WORKSPACE"
+        echo "datanimbus.io.ne :: BUILD FAILED"
         echo "****************************************************"
         exit 0
     fi
@@ -58,26 +58,26 @@ fi
 sh $WORKSPACE/scripts/prepare_yaml.sh $REL $2
 
 echo "****************************************************"
-echo "data.stack.ne :: Using build :: "$TAG
+echo "datanimbus.io.ne :: Using build :: "$TAG
 echo "****************************************************"
 
 cd $WORKSPACE
 
 echo "****************************************************"
-echo "data.stack.ne :: Adding IMAGE_TAG in Dockerfile :: "$TAG
+echo "datanimbus.io.ne :: Adding IMAGE_TAG in Dockerfile :: "$TAG
 echo "****************************************************"
 sed -i.bak s#__image_tag__#$TAG# Dockerfile
 
 if [ -f $WORKSPACE/../CLEAN_BUILD_NE ]; then
     echo "****************************************************"
-    echo "data.stack.ne :: Doing a clean build"
+    echo "datanimbus.io.ne :: Doing a clean build"
     echo "****************************************************"
     
-    docker build --no-cache -t data.stack.ne:$TAG .
+    docker build --no-cache -t datanimbus.io.ne:$TAG .
     rm $WORKSPACE/../CLEAN_BUILD_NE
 
     echo "****************************************************"
-    echo "data.stack.ne :: Copying deployment files"
+    echo "datanimbus.io.ne :: Copying deployment files"
     echo "****************************************************"
 
     if [ $CICD ]; then
@@ -95,26 +95,26 @@ if [ -f $WORKSPACE/../CLEAN_BUILD_NE ]; then
 
 else
     echo "****************************************************"
-    echo "data.stack.ne :: Doing a normal build"
+    echo "datanimbus.io.ne :: Doing a normal build"
     echo "****************************************************"
-    docker build -t data.stack.ne:$TAG .
+    docker build -t datanimbus.io.ne:$TAG .
     if [ $CICD ]; then
         if [ $DOCKER_REG ]; then
-            kubectl set image deployment/ne ne=$DOCKER_REG/data.stack.ne:$TAG -n $DATA_STACK_NS --record=true
+            kubectl set image deployment/ne ne=$DOCKER_REG/datanimbus.io.ne:$TAG -n $DATA_STACK_NS --record=true
         else 
-            kubectl set image deployment/ne ne=data.stack.ne:$TAG -n $DATA_STACK_NS --record=true
+            kubectl set image deployment/ne ne=datanimbus.io.ne:$TAG -n $DATA_STACK_NS --record=true
         fi
     fi
 fi
 if [ $DOCKER_REG ]; then
     echo "****************************************************"
-    echo "data.stack.ne :: Docker Registry found, pushing image"
+    echo "datanimbus.io.ne :: Docker Registry found, pushing image"
     echo "****************************************************"
 
-    docker tag data.stack.ne:$TAG $DOCKER_REG/data.stack.ne:$TAG
-    docker push $DOCKER_REG/data.stack.ne:$TAG
+    docker tag datanimbus.io.ne:$TAG $DOCKER_REG/datanimbus.io.ne:$TAG
+    docker push $DOCKER_REG/datanimbus.io.ne:$TAG
 fi
 echo "****************************************************"
-echo "data.stack.ne :: BUILD SUCCESS :: data.stack.ne:$TAG"
+echo "datanimbus.io.ne :: BUILD SUCCESS :: datanimbus.io.ne:$TAG"
 echo "****************************************************"
 echo $TAG > $WORKSPACE/../LATEST_NE

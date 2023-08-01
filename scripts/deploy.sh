@@ -6,12 +6,12 @@ TAG=`cat CURRENT_NE`
 
 
 echo "****************************************************"
-echo "data.stack:ne :: Deploying Image in K8S :: $NAMESPACE"
+echo "datanimbus.io.ne :: Deploying Image in K8S :: $NAMESPACE"
 echo "****************************************************"
 
-kubectl set image deployment/ne ne=$ECR_URL/data.stack.ne:$TAG -n $NAMESPACE --record=true
+kubectl set image deployment/ne ne=$ECR_URL/datanimbus.io.ne:$TAG -n $NAMESPACE --record=true
 
 
 echo "****************************************************"
-echo "data.stack:ne :: Image Deployed in K8S AS $ECR_URL/data.stack.ne:$TAG"
+echo "datanimbus.io.ne :: Image Deployed in K8S AS $ECR_URL/datanimbus.io.ne:$TAG"
 echo "****************************************************"
