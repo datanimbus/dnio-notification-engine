@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 const log4js = require("log4js");
 
-const config = require("./config");
+const config = require("./config"); 
+const { fetchEnvironmentVariablesFromDB } = require("./config");
 const version = require("./package.json").version;
 
 const LOG_LEVEL = process.env.LOG_LEVEL ? process.env.LOG_LEVEL : "info";
@@ -27,14 +28,19 @@ logsDB.on("reconnectFailed", () => { logger.error(` *** ${logsDBName} FAILED TO 
 global.logsDB = logsDB;
 
 const dbName = config.mongoOptions.dbName;
-(async () => {
-    try {
-        await mongoose.connect(config.mongoUrl, config.mongoOptions);
-        logger.info(`Connected to ${dbName} DB`);
-    } catch (err) {
-        logger.error(err);
-    }
-})();
+const initializeDatabase = () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            await mongoose.connect(config.mongoUrl, config.mongoOptions);
+            logger.info(`Connected to ${dbName} DB`);
+            const envVariables = await fetchEnvironmentVariablesFromDB();
+            resolve(envVariables);
+        } catch (err) {
+            logger.error(err);
+            reject(err);
+        }
+    });
+};
 
 mongoose.connection.on("connecting", () => { logger.info(` *** ${dbName} CONNECTING *** `); });
 mongoose.connection.on("disconnected", () => { logger.error(` *** ${dbName} LOST CONNECTION *** `); });
@@ -43,3 +49,5 @@ mongoose.connection.on("connected", () => { logger.info(`Connected to ${dbName} 
 mongoose.connection.on("reconnectFailed", () => { logger.error(` *** ${dbName} FAILED TO RECONNECT *** `); });
 
 require("./models").init();
+
+module.exports = initializeDatabase;

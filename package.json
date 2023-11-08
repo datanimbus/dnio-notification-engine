@@ -12,7 +12,7 @@
   "author": "Jugnu Agrawal",
   "license": "ISC",
   "dependencies": {
-    "@appveen/data.stack-utils": "^1.0.22",
+    "@appveen/data.stack-utils": "github:appveen/data.stack-utils",
     "@appveen/swagger-mongoose-crud": "^2.0.1",
     "@appveen/utils": "^2.2.1",
     "express": "^4.18.2",
