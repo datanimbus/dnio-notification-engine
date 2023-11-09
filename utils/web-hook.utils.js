@@ -70,7 +70,7 @@ async function processMessageOnHooksChannel(data, client) {
 async function postWebHook(data) {
     let txnId = data.txnId;
     try {
-        let timeout = (process.env.HOOK_CONNECTION_TIMEOUT && parseInt(process.env.HOOK_CONNECTION_TIMEOUT)) || 30;
+        let timeout = (config.HOOK_CONNECTION_TIMEOUT && parseInt(config.HOOK_CONNECTION_TIMEOUT)) || 30;
         data["headers"]["Content-Type"] = "application/json";
         let payload = JSON.parse(JSON.stringify(data));
         delete payload._metadata;

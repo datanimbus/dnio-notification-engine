@@ -1,5 +1,8 @@
 "use strict";
 
+const dataStackUtils = require('@appveen/data.stack-utils');
+let envVariables = {};
+
 function isK8sEnv() {
     return process.env.KUBERNETES_SERVICE_HOST && process.env.KUBERNETES_SERVICE_PORT;
 }
@@ -21,6 +24,17 @@ function get(_service) {
     }
 }
 
+async function fetchEnvironmentVariablesFromDB() {
+    try {
+        envVariables = await dataStackUtils.database.fetchEnvVariables();
+        return envVariables;
+    } catch (error) {
+        logger.error(error);
+        logger.error('Fetching environment variables failed. Crashing the component.');
+        process.exit(1);
+    }
+}
+
 module.exports = {
     retryCollectionName: "retryCollection",
     isK8sEnv: isK8sEnv,
@@ -35,7 +49,7 @@ module.exports = {
         stanMaxPingOut: process.env.STREAMING_RECONN_TIMEWAIT_MILLI || 500
     },
     baseUrlUM: get("user") + "/rbac",
-    eventsPostUrl: process.env.NE_EVENTS_URL || "",
+    eventsPostUrl: envVariables.NE_EVENTS_URL || "",
     mongoUrl: process.env.MONGO_AUTHOR_URL || "mongodb://localhost",
     validationApi: get("user") + "/rbac/validate",
     queueNames: {
@@ -54,11 +68,11 @@ module.exports = {
         }
     },
     retryCounter: {
-        webHooks: process.env.HOOK_RETRY ? parseInt(process.env.HOOK_RETRY) : 3
+        webHooks: envVariables.HOOK_RETRY ? parseInt(envVariables.HOOK_RETRY) : 3
     },
-    tlsInsecure: typeof process.env.TLS_REJECT_UNAUTHORIZED === "string" && process.env.TLS_REJECT_UNAUTHORIZED.toLowerCase() === "false",
+    tlsInsecure: typeof envVariables.TLS_REJECT_UNAUTHORIZED === "string" && envVariables.TLS_REJECT_UNAUTHORIZED.toLowerCase() === "false",
     retryDelay: {
-        webHooks: parseInt(process.env.HOOK_DELAY) || 10000
+        webHooks: parseInt(envVariables.HOOK_DELAY) || 10000
     },
     mongoOptions: {
         // reconnectTries: process.env.MONGO_RECONN_TRIES,
@@ -73,6 +87,7 @@ module.exports = {
         dbName: process.env.MONGO_LOGS_DBNAME || "datastackLogs",
         useNewUrlParser: true
     },
-    postHookBatch: parseInt(process.env.HOOK_POST_BATCH) || 500
-
+    postHookBatch: parseInt(envVariables.HOOK_POST_BATCH) || 500,
+    fetchEnvironmentVariablesFromDB: fetchEnvironmentVariablesFromDB,
+    HOOK_CONNECTION_TIMEOUT: envVariables.HOOK_CONNECTION_TIMEOUT
 };
