@@ -1,5 +1,5 @@
 const Mongoose = require("mongoose");
-const request = require("request-promise");
+const got = require("got");
 const log4js = require("log4js");
 const _ = require("lodash");
 
@@ -82,16 +82,18 @@ async function postWebHook(data) {
             url: data.url,
             method: "POST",
             headers: data.headers,
-            json: true,
-            body: payload,
-            timeout: timeout * 1000,
-            resolveWithFullResponse: true,
-            insecure: config.tlsInsecure,
-            rejectUnauthorized: config.tlsInsecure
+            responseType: "json",
+            json: payload,
+            timeout: {
+                request: timeout * 1000
+            },
+            https: {
+                rejectUnauthorized: config.tlsInsecure
+            }
         };
         logger.trace(`[${txnId}] [${data._id}] Hook request :: ${JSON.stringify(options)}`);
 
-        let response = await request(options);
+        let response = await got(options);
 
         logger.debug(`[${txnId}] [${data._id}] Hook response :: ${data.url} :: ${response.statusCode}`);
 

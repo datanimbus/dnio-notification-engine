@@ -1,7 +1,7 @@
 "use strict";
 let cron = require("node-cron");
 const Mongoose = require("mongoose");
-const request = require("request");
+const got = require("got");
 const log4js = require("log4js");
 const config = require("./config");
 const webHookUtils = require("./utils/web-hook.utils");
@@ -57,6 +57,50 @@ client.on("close", function () {
 process.on("SIGTERM", () => {
     client.close();
 });
+
+function getGOTOptions(options) {
+    let gotOptions = {};
+    gotOptions.throwHttpErrors = false;
+    gotOptions.url = options.url;
+    gotOptions.method = options.method;
+    gotOptions.headers = options.headers;
+    if (options.json) {
+        gotOptions.responseType = "json";
+    }
+    if (options.body) {
+        gotOptions.json = options.body;
+    }
+    if (options.qs) {
+        gotOptions.searchParams = options.qs;
+    }
+    return gotOptions;
+}
+
+function request(options, callback) {
+    const gotOptions = getGOTOptions(options);
+    got(gotOptions).then((res) => {
+        if (res) {
+            callback(null, res, res.body);
+        } else {
+            callback(null, null, null);
+        }
+    }).catch(err => {
+        handleError(err, callback);
+    });
+}
+
+function handleError(err, callback) {
+    let error = {};
+    error.code = err.code;
+    error.name = err.name;
+    error.message = err.message;
+    error.stack = err.stack;
+    if (error.code == "ECONNREFUSED") {
+        callback(null, null, null);
+    } else {
+        callback(error, null, null);
+    }
+}
 
 function natsScheduler() {
     if (client) {
@@ -184,7 +228,7 @@ function postEventData(eventData) {
                 "Content-Type": "application/json",
             }
         };
-        request.post(options, function (err, res, body) {
+        request(options, function (err, res, body) {
             if (err) {
                 logger.error(err);
                 logEvents(eventData, null, err, "failed", "Error in NE_EVENTS_URL api call");
@@ -215,5 +259,6 @@ function logEvents(eventData, statusCode, body, status, message) {
     };
     client.publish(q, JSON.stringify(qPayload));
 }
+
 
 module.exports.client = client;
