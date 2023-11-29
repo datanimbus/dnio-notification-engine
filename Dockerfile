@@ -4,7 +4,7 @@ RUN apk update
 RUN apk upgrade
 RUN set -ex; apk add --no-cache --virtual .fetch-deps curl tar git ;
 
-WORKDIR /app
+WORKDIR /tmp/app
 
 COPY package.json package.json
 
@@ -19,5 +19,7 @@ COPY . .
 ENV IMAGE_TAG=__image_tag__
 
 EXPOSE 10010
+
+RUN chmod -R 777 /tmp/app
 
 CMD node app.js
