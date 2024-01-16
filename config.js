@@ -51,6 +51,7 @@ module.exports = {
     baseUrlUM: get("user") + "/rbac",
     eventsPostUrl: envVariables.NE_EVENTS_URL || "",
     mongoUrl: process.env.MONGO_AUTHOR_URL || "mongodb://localhost",
+    dbAuthorUrl:  process.env.DB_AUTHOR_URL || process.env.MONGO_AUTHOR_URL || "mongodb://localhost",
     validationApi: get("user") + "/rbac/validate",
     queueNames: {
         webHooks: "webHooks",
@@ -85,6 +86,17 @@ module.exports = {
         // reconnectTries: process.env.MONGO_RECONN_TRIES,
         // reconnectInterval: process.env.MONGO_RECONN_TIME_MILLI,
         dbName: process.env.MONGO_LOGS_DBNAME || "datastackLogs",
+        useNewUrlParser: true
+    },
+    dbAuthorType: process.env.DB_AUTHOR_TYPE,
+    dbAuthorOptions: {
+        dbName: process.env.DB_AUTHOR_DBNAME || process.env.MONGO_AUTHOR_DBNAME || "datastackConfig",
+        useNewUrlParser: true
+    },
+    dbLogsType: process.env.DB_LOGS_TYPE,
+    dbLogsUrl: process.env.DB_LOGS_URL || process.env.MONGO_LOGS_URL || "mongodb://localhost",
+    dbLogsOptions: {
+        dbName: process.env.DB_LOGS_DBNAME || process.env.MONGO_LOGS_DBNAME || "datastackLogs",
         useNewUrlParser: true
     },
     postHookBatch: parseInt(envVariables.HOOK_POST_BATCH) || 500,
